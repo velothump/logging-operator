@@ -39,3 +39,26 @@ func (r *Reconciler) service() runtime.Object {
 		},
 	}
 }
+
+func (r *Reconciler) monitorService() runtime.Object {
+	if r.Logging.Spec.FluentdSpec.Metrics != nil {
+		return &corev1.Service{
+			ObjectMeta: templates.FluentdObjectMeta(
+				r.Logging.QualifiedName(ServiceName+"-monitor"), util.MergeLabels(r.Logging.Labels, labelSelector), r.Logging),
+			Spec: corev1.ServiceSpec{
+				Ports: []corev1.ServicePort{
+					{
+						Protocol:   corev1.ProtocolTCP,
+						Name:       "monitor",
+						Port:       r.Logging.Spec.FluentdSpec.Metrics.Port,
+						TargetPort: intstr.IntOrString{IntVal: r.Logging.Spec.FluentdSpec.Metrics.Port},
+					},
+				},
+				Selector:  labelSelector,
+				Type:      corev1.ServiceTypeClusterIP,
+				ClusterIP: "None",
+			},
+		}
+	}
+	return nil
+}

@@ -31,7 +31,11 @@ type fluentBitConfig struct {
 		Enabled   bool
 		SharedKey string
 	}
-	Monitor    map[string]string
+	Monitor struct {
+		Enabled bool
+		Port    int32
+		Path    string
+	}
 	Output     map[string]string
 	TargetHost string
 	TargetPort int32
@@ -39,11 +43,15 @@ type fluentBitConfig struct {
 }
 
 func (r *Reconciler) configSecret() runtime.Object {
-	var monitorConfig map[string]string
-	if _, ok := r.Logging.Spec.FluentbitSpec.Annotations["prometheus.io/port"]; ok {
-		monitorConfig = map[string]string{
-			"Port": r.Logging.Spec.FluentbitSpec.Annotations["prometheus.io/port"],
-		}
+	monitor := struct {
+		Enabled bool
+		Port    int32
+		Path    string
+	}{}
+	if r.Logging.Spec.FluentbitSpec.Metrics != nil {
+		monitor.Enabled = true
+		monitor.Port = r.Logging.Spec.FluentbitSpec.Metrics.Port
+		monitor.Path = r.Logging.Spec.FluentbitSpec.Metrics.Path
 	}
 	input := fluentBitConfig{
 		Namespace: r.Logging.Spec.ControlNamespace,
@@ -54,7 +62,7 @@ func (r *Reconciler) configSecret() runtime.Object {
 			Enabled:   r.Logging.Spec.FluentbitSpec.TLS.Enabled,
 			SharedKey: r.Logging.Spec.FluentbitSpec.TLS.SharedKey,
 		},
-		Monitor:    monitorConfig,
+		Monitor:    monitor,
 		TargetHost: fmt.Sprintf("%s.%s.svc", r.Logging.QualifiedName(fluentd.ServiceName), r.Logging.Spec.ControlNamespace),
 		TargetPort: r.Logging.Spec.FluentdSpec.Port,
 	}

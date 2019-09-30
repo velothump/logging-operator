@@ -28,10 +28,10 @@ func (r *Reconciler) daemonSet() runtime.Object {
 
 	var containerPorts []corev1.ContainerPort
 
-	if _, ok := r.Logging.Spec.FluentbitSpec.Annotations["prometheus.io/port"]; ok {
+	if r.Logging.Spec.FluentbitSpec.Metrics != nil && r.Logging.Spec.FluentbitSpec.Metrics.Port != 0 {
 		containerPorts = append(containerPorts, corev1.ContainerPort{
 			Name:          "monitor",
-			ContainerPort: r.Logging.Spec.FluentbitSpec.GetPrometheusPortFromAnnotation(),
+			ContainerPort: r.Logging.Spec.FluentbitSpec.Metrics.Port,
 			Protocol:      corev1.ProtocolTCP,
 		})
 	}

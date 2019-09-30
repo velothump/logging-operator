@@ -129,10 +129,10 @@ func generatePorts(spec *v1beta1.FluentdSpec) []corev1.ContainerPort {
 			Protocol:      "TCP",
 		},
 	}
-	if spec.GetPrometheusPortFromAnnotation() != 0 {
+	if spec.Metrics != nil && spec.Metrics.Port != 0 {
 		ports = append(ports, corev1.ContainerPort{
 			Name:          "monitor",
-			ContainerPort: spec.GetPrometheusPortFromAnnotation(),
+			ContainerPort: spec.Metrics.Port,
 			Protocol:      "TCP",
 		})
 	}

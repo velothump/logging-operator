@@ -28,6 +28,13 @@ import (
 	runtimeClient "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+const (
+	StateAbsent  DesiredState = "Absent"
+	StatePresent DesiredState = "Present"
+)
+
+type DesiredState string
+
 // GenericResourceReconciler generic resource reconciler
 type GenericResourceReconciler struct {
 	Log    logr.Logger
@@ -49,7 +56,7 @@ func (r *GenericResourceReconciler) CreateResource(desired runtime.Object) error
 }
 
 // ReconcileResource reconciles various kubernetes types
-func (r *GenericResourceReconciler) ReconcileResource(desired runtime.Object) error {
+func (r *GenericResourceReconciler) ReconcileResource(desired runtime.Object, desiredState DesiredState) error {
 	log := r.Log.WithValues("type", reflect.TypeOf(desired))
 	created, current, err := r.createIfNotExists(desired)
 	if err == nil && created {

@@ -26,9 +26,10 @@ import (
 )
 
 type fluentdConfig struct {
-	TLS struct {
-		Enabled   bool
-		SharedKey string
+	Monitor struct {
+		Enabled bool
+		Port    int32
+		Path    string
 	}
 }
 
@@ -47,15 +48,19 @@ func generateConfig(input fluentdConfig) string {
 }
 
 func (r *Reconciler) secretConfig() runtime.Object {
-	input := fluentdConfig{
-		TLS: struct {
-			Enabled   bool
-			SharedKey string
-		}{
-			Enabled:   r.Logging.Spec.FluentdSpec.TLS.Enabled,
-			SharedKey: r.Logging.Spec.FluentdSpec.TLS.SharedKey,
-		},
+	input := fluentdConfig{Monitor: struct {
+		Enabled bool
+		Port    int32
+		Path    string
+	}{},
 	}
+
+	if r.Logging.Spec.FluentdSpec.Metrics != nil {
+		input.Monitor.Enabled = true
+		input.Monitor.Port = r.Logging.Spec.FluentdSpec.Metrics.Port
+		input.Monitor.Path = r.Logging.Spec.FluentdSpec.Metrics.Path
+	}
+
 	return &corev1.Secret{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(SecretConfigName), util.MergeLabels(r.Logging.Labels, labelSelector), r.Logging),
