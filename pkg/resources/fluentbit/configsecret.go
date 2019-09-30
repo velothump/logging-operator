@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/fluentd"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	corev1 "k8s.io/api/core/v1"
@@ -42,7 +43,7 @@ type fluentBitConfig struct {
 	Parser     string
 }
 
-func (r *Reconciler) configSecret() runtime.Object {
+func (r *Reconciler) configSecret() (runtime.Object, k8sutil.DesiredState) {
 	monitor := struct {
 		Enabled bool
 		Port    int32
@@ -83,7 +84,7 @@ func (r *Reconciler) configSecret() runtime.Object {
 		Data: map[string][]byte{
 			"fluent-bit.conf": []byte(generateConfig(input)),
 		},
-	}
+	}, k8sutil.StatePresent
 }
 
 func generateConfig(input fluentBitConfig) string {

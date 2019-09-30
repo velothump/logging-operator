@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"html/template"
 
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/util"
 	corev1 "k8s.io/api/core/v1"
@@ -47,7 +48,7 @@ func generateConfig(input fluentdConfig) string {
 	return outputString
 }
 
-func (r *Reconciler) secretConfig() runtime.Object {
+func (r *Reconciler) secretConfig() (runtime.Object, k8sutil.DesiredState) {
 	input := fluentdConfig{Monitor: struct {
 		Enabled bool
 		Port    int32
@@ -69,5 +70,5 @@ func (r *Reconciler) secretConfig() runtime.Object {
 			"input.conf":   []byte(generateConfig(input)),
 			"devnull.conf": []byte(fluentdOutputTemplate),
 		},
-	}
+	}, k8sutil.StatePresent
 }

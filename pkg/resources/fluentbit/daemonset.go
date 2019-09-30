@@ -15,6 +15,7 @@
 package fluentbit
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/util"
 	appsv1 "k8s.io/api/apps/v1"
@@ -24,7 +25,7 @@ import (
 )
 
 // TODO in case of rbac add created serviceAccount name
-func (r *Reconciler) daemonSet() runtime.Object {
+func (r *Reconciler) daemonSet() (runtime.Object, k8sutil.DesiredState) {
 
 	var containerPorts []corev1.ContainerPort
 
@@ -65,7 +66,7 @@ func (r *Reconciler) daemonSet() runtime.Object {
 				},
 			},
 		},
-	}
+	}, k8sutil.StatePresent
 }
 
 func (r *Reconciler) generateVolumeMounts() (v []corev1.VolumeMount) {

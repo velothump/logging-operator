@@ -20,6 +20,7 @@ import (
 	"hash/fnv"
 
 	"emperror.dev/errors"
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/util"
 	corev1 "k8s.io/api/core/v1"
@@ -36,14 +37,14 @@ type ConfigCheckResult struct {
 
 const ConfigKey = "generated.conf"
 
-func (r *Reconciler) appconfigMap() runtime.Object {
+func (r *Reconciler) appconfigMap() (runtime.Object, k8sutil.DesiredState) {
 	data := make(map[string][]byte)
 	data[AppConfigKey] = []byte(*r.config)
 	return &corev1.Secret{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(AppSecretConfigName), util.MergeLabels(r.Logging.Labels, labelSelector), r.Logging),
 		Data: data,
-	}
+	}, k8sutil.StatePresent
 }
 
 func (r *Reconciler) configHash() (string, error) {

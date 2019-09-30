@@ -122,8 +122,8 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.service,
 		r.monitorService,
 	} {
-		o := res()
-		err := r.ReconcileResource(o)
+		o, state := res()
+		err := r.ReconcileResource(o, state)
 		if err != nil {
 			return nil, errors.WrapIf(err, "failed to reconcile resource")
 		}

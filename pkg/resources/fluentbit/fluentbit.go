@@ -30,6 +30,7 @@ const (
 	clusterRoleName           = "logging"
 	fluentBitSecretConfigName = "fluentbit"
 	fluentbitDaemonSetName    = "fluentbit"
+	fluentbitServiceName      = "fluentbit"
 )
 
 var labelSelector = map[string]string{
@@ -56,10 +57,12 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.serviceAccount,
 		r.clusterRole,
 		r.clusterRoleBinding,
-		r.configSecret, r.daemonSet,
+		r.configSecret,
+		r.daemonSet,
+		r.monitorService,
 	} {
-		o := res()
-		err := r.ReconcileResource(o)
+		o, state := res()
+		err := r.ReconcileResource(o, state)
 		if err != nil {
 			return nil, emperror.WrapWith(err, "failed to reconcile resource", "resource", o.GetObjectKind().GroupVersionKind())
 		}

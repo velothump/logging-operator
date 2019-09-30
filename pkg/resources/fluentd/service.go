@@ -15,6 +15,7 @@
 package fluentd
 
 import (
+	"github.com/banzaicloud/logging-operator/pkg/k8sutil"
 	"github.com/banzaicloud/logging-operator/pkg/resources/templates"
 	"github.com/banzaicloud/logging-operator/pkg/util"
 	corev1 "k8s.io/api/core/v1"
@@ -22,7 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func (r *Reconciler) service() runtime.Object {
+func (r *Reconciler) service() (runtime.Object, k8sutil.DesiredState) {
 	return &corev1.Service{
 		ObjectMeta: templates.FluentdObjectMeta(
 			r.Logging.QualifiedName(ServiceName), util.MergeLabels(r.Logging.Labels, labelSelector), r.Logging),
@@ -37,10 +38,10 @@ func (r *Reconciler) service() runtime.Object {
 			Selector: labelSelector,
 			Type:     corev1.ServiceTypeClusterIP,
 		},
-	}
+	}, k8sutil.StatePresent
 }
 
-func (r *Reconciler) monitorService() runtime.Object {
+func (r *Reconciler) monitorService() (runtime.Object, k8sutil.DesiredState) {
 	if r.Logging.Spec.FluentdSpec.Metrics != nil {
 		return &corev1.Service{
 			ObjectMeta: templates.FluentdObjectMeta(
@@ -58,7 +59,10 @@ func (r *Reconciler) monitorService() runtime.Object {
 				Type:      corev1.ServiceTypeClusterIP,
 				ClusterIP: "None",
 			},
-		}
+		}, k8sutil.StatePresent
 	}
-	return nil
+	return &corev1.Service{
+		ObjectMeta: templates.FluentdObjectMeta(
+			r.Logging.QualifiedName(ServiceName+"-monitor"), util.MergeLabels(r.Logging.Labels, labelSelector), r.Logging),
+		Spec: corev1.ServiceSpec{}}, k8sutil.StateAbsent
 }
