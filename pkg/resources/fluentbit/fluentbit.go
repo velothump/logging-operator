@@ -59,7 +59,7 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.clusterRoleBinding,
 		r.configSecret,
 		r.daemonSet,
-		r.monitorService,
+		r.serviceMetrics,
 	} {
 		o, state := res()
 		err := r.ReconcileResource(o, state)

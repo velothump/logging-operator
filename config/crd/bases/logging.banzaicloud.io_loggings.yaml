@@ -71,9 +71,9 @@ spec:
                     port:
                       format: int32
                       type: integer
-                    prometheusannotations:
+                    prometheusAnnotations:
                       type: boolean
-                    servicemonitor:
+                    serviceMonitor:
                       type: boolean
                     timeout:
                       type: string
@@ -319,9 +319,9 @@ spec:
                     port:
                       format: int32
                       type: integer
-                    prometheusannotations:
+                    prometheusAnnotations:
                       type: boolean
-                    servicemonitor:
+                    serviceMonitor:
                       type: boolean
                     timeout:
                       type: string

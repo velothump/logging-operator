@@ -25,7 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-func (r *Reconciler) monitorService() (runtime.Object, k8sutil.DesiredState) {
+func (r *Reconciler) serviceMetrics() (runtime.Object, k8sutil.DesiredState) {
 	if r.Logging.Spec.FluentbitSpec.Metrics != nil {
 		return &corev1.Service{
 			ObjectMeta: templates.FluentbitObjectMeta(

@@ -120,7 +120,8 @@ func (r *Reconciler) Reconcile() (*reconcile.Result, error) {
 		r.appconfigMap,
 		r.statefulset,
 		r.service,
-		r.monitorService,
+		r.serviceMetrics,
+		r.monitorServiceMetrics,
 	} {
 		o, state := res()
 		err := r.ReconcileResource(o, state)
